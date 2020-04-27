@@ -31,7 +31,7 @@ function uploadImages(file){
     //   document.querySelector(".btn-upload").disabled = true;
     // },
     success:function(r){
-      console.log(r);
+      $("#breed-text").text(r);
     },
     failure: function(e) {
       console.log(e)

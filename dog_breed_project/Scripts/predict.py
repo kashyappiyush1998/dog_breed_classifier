@@ -7,30 +7,43 @@ import matplotlib.pyplot as plt
 from keras.applications.resnet50 import preprocess_input, preprocess_input, decode_predictions   
 from .preprocess import path_to_tensor 
 from keras.models import Model
+import tensorflow as tf
 
 # %matplotlib inline
-my_path = os.path.abspath(os.path.dirname(__file__))
-print(my_path)
-print("Print os path " + os.path.dirname(__file__))
+
+global face_cascade
 face_cascade = cv2.CascadeClassifier(os.path.dirname(__file__)+'/data/haarcascade_frontalface_alt.xml')
 
+global graph
+global model
 loaded_model = keras.models.load_model(os.path.dirname(__file__)+'/data/Resnet_dog_detector.hdf5')
+graph = tf.get_default_graph()
+
+global new_model_include_top_false
 new_model_include_top_false = keras.models.load_model(os.path.dirname(__file__) + '/data/Resnet_dog_detector.hdf5')
 new_model_include_top_false.layers.pop()
 new_model_include_top_false.layers.pop()
 new_model_include_top_false = Model(new_model_include_top_false.input, new_model_include_top_false.layers[-1].output)
+graph = tf.get_default_graph()
 
+global model_best_weights
 model_best_weights = keras.models.load_model(os.path.dirname(__file__) + '/data/weights.best.Resnet50.hdf5')
+graph = tf.get_default_graph()
+
+global dog_names
 dog_names =  np.load(os.path.dirname(__file__) + '/data/dog_names.npy')
 
-
 def extract_Resnet50(tensor):
-	return new_model_include_top_false.predict(preprocess_input(tensor))
+    with graph.as_default():
+        preds = new_model_include_top_false.predict(preprocess_input(tensor))
+    return preds
 
 def ResNet50_predict_labels(img_path):
     # returns prediction vector for image located at img_path
     img = preprocess_input(path_to_tensor(img_path))
-    return np.argmax(loaded_model.predict(img))
+    with graph.as_default():
+        preds = loaded_model.predict(img)
+    return np.argmax(preds)
 
 ### returns "True" if a dog is detected in the image stored at img_path
 def dog_detector(img_path):
@@ -53,7 +66,9 @@ def predict_breed(img_path):
         return text
     
     bottleneck_feature = extract_Resnet50(path_to_tensor(img_path))
-    breed = dog_names[np.argmax(model_best_weights.predict(bottleneck_feature))]
+    with graph.as_default():
+        breed_class = model_best_weights.predict(bottleneck_feature)
+    breed = dog_names[np.argmax(breed_class)]
     
     text = text + breed 
     return text
