@@ -9,16 +9,19 @@ from .preprocess import path_to_tensor
 from keras.models import Model
 
 # %matplotlib inline
+my_path = os.path.abspath(os.path.dirname(__file__))
+print(my_path)
+print("Print os path " + os.path.dirname(__file__))
+face_cascade = cv2.CascadeClassifier(os.path.dirname(__file__)+'/data/haarcascade_frontalface_alt.xml')
 
-face_cascade = cv2.CascadeClassifier('data\haarcascade_frontalface_alt.xml')
-loaded_model = keras.models.load_model("data\Resnet_dog_detector.hdf5")
-new_model_include_top_false = keras.models.load_model("data\Resnet_dog_detector.hdf5")
+loaded_model = keras.models.load_model(os.path.dirname(__file__)+'/data/Resnet_dog_detector.hdf5')
+new_model_include_top_false = keras.models.load_model(os.path.dirname(__file__) + '/data/Resnet_dog_detector.hdf5')
 new_model_include_top_false.layers.pop()
 new_model_include_top_false.layers.pop()
 new_model_include_top_false = Model(new_model_include_top_false.input, new_model_include_top_false.layers[-1].output)
 
-model_best_weights = keras.models.load_model('data\weights.best.Resnet50.hdf5')
-dog_names =  np.load("data\dog_names.npy")
+model_best_weights = keras.models.load_model(os.path.dirname(__file__) + '/data/weights.best.Resnet50.hdf5')
+dog_names =  np.load(os.path.dirname(__file__) + '/data/dog_names.npy')
 
 
 def extract_Resnet50(tensor):
@@ -55,5 +58,5 @@ def predict_breed(img_path):
     text = text + breed 
     return text
 
-print(predict_breed("dog.png"))
+# print(predict_breed("dog.png"))
 
