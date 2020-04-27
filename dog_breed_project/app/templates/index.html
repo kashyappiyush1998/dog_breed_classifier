@@ -1,0 +1,18 @@
+<html>
+<head>
+    
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+    <script src="{{ url_for('.static', filename='script.js') }}"></script>
+</head>
+<body>
+    <h2>Dog Breed Predictor</h2>
+    <div>
+        <img src="" style="height: 500px; width: 500px;" id="show-image">
+    </div>
+    <div>
+        <input type="file" id="input-image">
+        <button type="button" id="get-breed">Predict Breed</button>
+    </div>
+    <h5 id="breed-text"></h5>
+</body>
+</html>
