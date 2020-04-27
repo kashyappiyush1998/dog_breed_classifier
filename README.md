@@ -2,7 +2,7 @@
 This is a web app in which given an image of a dog, algorithm will identify an estimate of the canine’s breed. If supplied an image of a human, it will identify the resembling dog breed.
 
 To Use this - 
-1. Clone this locally
+1. Clone this locally and download data from https://drive.google.com/open?id=1f-7uHHIwTHKeT7SH22-zbE8u4JqBW1Qz and save it in dog_breed_projects/scripts/data
 2. Create a new virtual environment - 'python -m venv venv'
 3. Activate virtual environment (Windows) - venv\Scripts\activate
 4. To install all required files use command  - 'pip install -r requirements.txt'
