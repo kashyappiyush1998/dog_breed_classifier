@@ -4,27 +4,34 @@ from keras.utils import np_utils
 import numpy as np
 import cv2                
 import matplotlib.pyplot as plt
-from keras.applications.resnet50 import ResNet50, preprocess_input, preprocess_input, decode_predictions   
+from keras.applications.resnet50 import preprocess_input, preprocess_input, decode_predictions   
 from preprocess import path_to_tensor 
+from keras.models import Model
 
 # %matplotlib inline
 
-face_cascade = cv2.CascadeClassifier('../data/haarcascades/haarcascade_frontalface_alt.xml')
-loaded_model = keras.models.load_model("../data/Resnet_dog_detector.hdf5")
+face_cascade = cv2.CascadeClassifier('../../data/haarcascade_frontalface_alt.xml')
 
-Resnet50_model = keras.models.load_model('../data/weights.best.Resnet50.hdf5')
-dog_names =  np.load("../data/dog_names.npy")
+loaded_model = keras.models.load_model("../../data/Resnet_dog_detector.hdf5")
+new_model_include_top_false = keras.models.load_model("../../data/Resnet_dog_detector.hdf5")
+new_model_include_top_false.layers.pop()
+new_model_include_top_false.layers.pop()
+new_model_include_top_false = Model(new_model_include_top_false.input, new_model_include_top_false.layers[-1].output)
+
+model_best_weights = keras.models.load_model('../../data/weights.best.Resnet50.hdf5')
+dog_names =  np.load("../../data/dog_names.npy")
+
 
 def extract_Resnet50(tensor):
-	return ResNet50(weights='imagenet', include_top=False).predict(preprocess_input(tensor))
+	return new_model_include_top_false.predict(preprocess_input(tensor))
 
-def Resnet50_predict_breed(img_path):
-    # extract bottleneck features
-    bottleneck_feature = extract_Resnet50(path_to_tensor(img_path))
-    # obtain predicted vector
-    predicted_vector = extract_Resnet50.predict(bottleneck_feature)
-    # return dog breed that is predicted by the model
-    return dog_names[np.argmax(predicted_vector)]
+# def Resnet50_predict_breed(img_path):
+#     # extract bottleneck features
+#     bottleneck_feature = extract_Resnet50(path_to_tensor(img_path))
+#     # obtain predicted vector
+#     predicted_vector = Resnet50_model.predict(bottleneck_feature)
+#     # return dog breed that is predicted by the model
+#     return dog_names[np.argmax(predicted_vector)]
 
 def ResNet50_predict_labels(img_path):
     # returns prediction vector for image located at img_path
@@ -51,10 +58,11 @@ def predict_breed(img_path):
         print("Image does not belong to dog or human")
         return
     
-    breed = Resnet50_predict_breed(img_path)
+    bottleneck_feature = extract_Resnet50(path_to_tensor(img_path))
+    breed = dog_names[np.argmax(model_best_weights.predict(bottleneck_feature))]
     
     print(breed)
     return
 
-print(dog_detector("dog.png"))
+print(predict_breed("dog.png"))
 
