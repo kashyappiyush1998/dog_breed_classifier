@@ -14,11 +14,19 @@ def index():
 
 @app.route("/upload-image", methods=["POST"])
 def uploadImage():
+
+    ''' This function recieves image from ajax and returns string to be printed below the image,
+    containing prediction '''
+
+    #get image from ajax
     imagefile = request.files['file']
     filepath = os.path.join(os.path.dirname(__file__) + "/app/image", 'image.jpg')
     print(imagefile)
+
+    #save our image
     imagefile.save(filepath)
 
+    #get the message along with preediction
     msg = predict.predict_breed(filepath)
     print(msg)
     return msg
